@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+
+    <h2>会議の登録</h2>
+    <form action="/register" method="POST">
+        <p>会議URL: <input name="url" type="text" value=""></p>
+        <p>パスワード: <input name="password" type="password" value=""></p>
+        <p><input type="submit"></p>
+    </form>
+
+    <h2>登録済の会議</h2>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>TTL</th><th>URL</th></tr>
+        </thead>
+        <tbody>
+        % for i in items:
+            <tr><td>{{ i['id'] }}</td><td>{{ i['ttl'] }}</td><td>{{ i['url'] }}</td></tr>
+        % end
+        </tbody>
+    </table>
+</body>
+</html>
