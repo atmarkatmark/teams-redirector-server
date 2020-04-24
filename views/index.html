@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
     <title>{{ title }}</title>
 
     <style>
-        input#id {
+        input#mid {
             font-size: 2em;
             letter-spacing: 0.4em;
             border: 2px solid black;
@@ -26,9 +27,49 @@
 </head>
 <body>
     <h1>{{ title }}</h1>
-    <form action="/start" method="GET">
-        <p>会議IDを入力してください: <br><input id="id" name="id" type="text" value="" maxlength="8"></p>
-        <p><input type="submit" value="参加"></p>
-    </form>
+    
+    % if error:
+        <p><strong>{{ error }}</strong></p>
+    % end
+    
+    <div id="app">
+        <form action="/" method="GET">
+            <p>参加する会議IDを入力してください: <br><input id="mid" name="mid" type="text" value="" autofocus maxlength="8" @input="sync"></p>
+            <p><input type="submit" value="参加"></p>
+        </form>
+    </div>
+
+    <h2>メニュー</h2>
+    <ul>
+        <li><a href="/manage">会議の管理</a></li>
+    </ul>
+
+    <script>
+        let app = new Vue({
+            el: "#app",
+            data () {
+                mid: ''
+            },
+
+            computed: {
+                mid_is_valid () {
+                    if (this.mid.length == 8 && /^[0-9]{8}$/.test(this.mid))
+                        return true
+                    
+                    return false
+                },
+            },
+
+            methods: {
+
+                sync (e) {
+                    this.mid = e.target.value
+                    this.ready_to_join = this.mid_is_valid
+                    console.log(this.mid)
+                    console.log(this.is_valid())
+                }
+            }
+        })
+    </script>
 </body>
 </html>

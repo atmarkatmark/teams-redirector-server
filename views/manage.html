@@ -1,30 +1,142 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
     <title>{{ title }}</title>
+
+    <style>
+        #receiver {
+            border: 1px solid gray;
+
+            height: 8em;
+        }
+
+        #receiver::before {
+            position: relative;
+            top: 8px;
+            left: 12px;
+            color: lightgray;
+            content: attr(data-placeholder);
+        }
+
+        .mid span {
+            margin-left: 0.2em;
+            margin-right: 0.2em;
+            font-weight: bold;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+
+        td,
+        th {
+            padding: 10px;
+        }
+
+        th {
+            color: #fff;
+            background: green;
+        }
+
+        table tr:nth-child(even) {
+            background: mintcream;
+        }
+
+        tr.new {
+            border: solid 1px orange;
+        }
+
+        tr.new td {
+            background: orange;
+        }
+    </style>
 </head>
+
 <body>
     <h1>{{ title }}</h1>
 
-    <h2>会議の登録</h2>
-    <form action="/register" method="POST">
-        <p>会議URL: <input name="url" type="text" value=""></p>
-        <p>パスワード: <input name="password" type="password" value=""></p>
-        <p><input type="submit"></p>
-    </form>
-
     <h2>登録済の会議</h2>
+    % if len(items):
     <table>
         <thead>
-            <tr><th>ID</th><th>TTL</th><th>URL</th></tr>
+            <tr>
+                <th>ID</th>
+                <th>残り時間</th>
+                <th>URL</th>
+            </tr>
         </thead>
         <tbody>
-        % for i in items:
-            <tr><td>{{ i['id'] }}</td><td>{{ i['ttl'] }}</td><td>{{ i['url'] }}</td></tr>
-        % end
+            % for i in items:
+            <tr {{ 'class=new' if 590 < i['ttl'] else '' }}>
+                <td class="mid"><span>{{ i['mid'][:4] }}</span><span>{{ i['mid'][4:] }}</span></td>
+                <td>{{ i['ttl'] }} 秒</td>
+                <td><a href="{{ i['url'] }}" target="_blank">Link</a></td>
+            </tr>
+            % end
         </tbody>
     </table>
+    % end
+    % if len(items) == 0: # elseが使えなかった
+    <p>登録されている会議はありません。</p>
+    % end
+
+    <h2>会議の登録</h2>
+    <form action="/register" method="POST">
+        <!-- Teamsの会議参加リンク貼り付け場所 -->
+        <div id="app">
+            <div id="receiver" contentEditable="true" @input="find_urls" :data-placeholder="placeholder"></div>
+            <p>会議URL: <textarea id="url" name="url" rows="3" style="height: 5em; width: 100%;" v-text="url"></textarea>
+            </p>
+        </div>
+
+        <p>パスワード: <input name="password" type="password" value=""></p>
+        <p><input type="submit" value="登録"></p>
+    </form>
+
+    <h2>メニュー</h2>
+    <ul>
+        <li><a href="/">会議へ参加</a></li>
+    </ul>
+
+    <script>
+        let app = new Vue({
+            el: '#app',
+            data () {
+                return {
+                    content: '',
+                    url: null
+                }
+            },
+
+            computed: {
+                // 貼り付け場所のプレースホルダーを疑似再現
+                placeholder: function () {
+                    if (this.content.length)
+                        return ''
+
+                    return 'Teamsでコピーした会議参加情報をここに貼り付けてください'
+                }
+            },
+
+            methods: {
+                find_urls(e) {
+                    const s = this.content = e.target.innerHTML
+
+                    // 会議参加URLの抽出
+                    let m = s.match(/https:\/\/teams.microsoft.com\/[^"]+/g)
+                    if (m) {
+                        this.url = m[0]
+                    }
+                }
+            }
+        })
+    </script>
+
 </body>
+
 </html>
