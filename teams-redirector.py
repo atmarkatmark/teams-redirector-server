@@ -59,7 +59,7 @@ def index():
     redirect(url)
 
 
-@route('/manage')
+@route('/manage', method=['GET', 'POST', 'CONNECT', 'HEAD'])
 def manage(mid=False):
     '''
         登録された会議の一覧を表示します。
