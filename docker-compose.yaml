@@ -1,0 +1,14 @@
+version: '3'
+services:
+        redirector:
+                build: .
+                container_name: redirector-server
+                restart: always
+                ports:
+                        - 8007:8080
+
+        redis:
+                container_name: redirector-redis
+                image: redis
+                restart: always
+
