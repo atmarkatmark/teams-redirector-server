@@ -4,45 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
     <title>{{ title }}</title>
 
     <style>
         input#mid {
-            font-size: 2em;
-            letter-spacing: 0.4em;
-            border: 2px solid black;
-            font-weight: bolder;
-            width: 100%;
-            height: 2em;
             text-align: center;
-        }
-
-        input[type="submit"] {
-            display: inline-block;
-            width: 100%;
-            height: 3em;
-            font-size: 1.5em;
+            letter-spacing: 0.2em;
         }
     </style>
 </head>
 <body>
-    <h1>{{ title }}</h1>
+    <h1 class="title">{{ title }}</h1>
     
     % if error:
         <p><strong>{{ error }}</strong></p>
     % end
     
-    <div id="app">
-        <form action="/" method="GET">
-            <p>参加する会議IDを入力してください: <br><input id="mid" name="mid" type="text" value="" autofocus maxlength="8" @input="sync"></p>
-            <p><input type="submit" value="参加"></p>
-        </form>
-    </div>
+    <p class="label">参加する会議IDを入力してください: </p>
 
-    <h2>メニュー</h2>
-    <ul>
-        <li><a href="/manage">会議の管理</a></li>
-    </ul>
+    <form action="/" method="GET">
+        <div id="app" class="columns">
+            <div class="column field is-two-thirds is-full-mobile">
+                <input id="mid" name="mid" type="text" value="" autofocus maxlength="8" @input="sync" class="input is-primary is-large">
+            </div>
+            <div class="column">
+                <button type="submit" class="button is-link is-large is-fullwidth">参加</button>
+            </div>
+        </div>
+    </form>
 
     <script>
         let app = new Vue({
@@ -65,8 +55,6 @@
                 sync (e) {
                     this.mid = e.target.value
                     this.ready_to_join = this.mid_is_valid
-                    console.log(this.mid)
-                    console.log(this.is_valid())
                 }
             }
         })

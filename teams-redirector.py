@@ -5,12 +5,13 @@ import redis
 import random, string
 from hashlib import blake2b
 import re
+from time import sleep
 
 # Redisの用意
 r = redis.Redis(host='localhost', port=6379, db=0)
 
 title = 'Microsoft Teams Redirector'
-timeout = 60 * 10   # seconds
+seconds_to_keep = 60 * 10   # seconds
 password_digest = 'bc9ce810393f85d62d6715cba864d1f60cdd6000fdb80c5d8459556baac12b2a1124018871c02cefdad19ba167a61373e11466774b32b4dfcdbbd880fdfc9176'
 # sample password: hogehoge
 '''
@@ -20,6 +21,7 @@ password_digest = 'bc9ce810393f85d62d6715cba864d1f60cdd6000fdb80c5d8459556baac12
     3. s = 'some string'
     4. blake2b(s.encode('utf-8')).hexdigest()
 '''
+path_prefix = ''
 validator = {}
 validator['url'] = r'^https://teams.microsoft.com/[a-zA-Z0-9\.%/\?=-]+$'
 validator['mid'] = r'[0-9]{8}'
@@ -76,11 +78,16 @@ def manage(mid=False):
         # TTLが１秒未満ならスキップ
         if item['ttl'] < 1:
             continue
+
+        # TTLが598未満ならスキップ
+        if item['ttl'] < 598:
+            continue
         
         items.append(item)
     
     # TTL順にソート
     items = sorted(items, key=lambda i: i['ttl'], reverse=True)
+
     return template('manage', title='会議の管理', items=items, mid=mid)
 
 
@@ -99,6 +106,9 @@ def register():
     if not re.match(validator['password'], pw):
         return template('error', title='Bad Password', message='パスワードが不正です')
 
+    # 連続登録を防ぐための簡易処置
+    sleep(3)
+
     # Check password
     if blake2b(pw.encode('utf-8')).hexdigest() != password_digest:
         return template('error', title='Wrong Password', message='パスワードが誤っています。')
@@ -106,8 +116,8 @@ def register():
     # Generate meeating id
     mid = gen_mid()
     r.set(mid, url)
-    r.expire(mid, timeout)
+    r.expire(mid, seconds_to_keep)
 
-    redirect('/manage')
+    redirect(path_prefix + '/manage')
 
 run(host='localhost', port=8080, debug=True)
