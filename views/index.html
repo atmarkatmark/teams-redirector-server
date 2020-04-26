@@ -21,12 +21,15 @@
         <p><strong>{{ error }}</strong></p>
     % end
     
-    <p class="label">参加する会議IDを入力してください: </p>
-
     <form action="/" method="GET">
         <div id="app" class="columns">
-            <div class="column field is-two-thirds is-full-mobile">
-                <input id="mid" name="mid" type="text" value="" autofocus maxlength="8" @input="sync" class="input is-primary is-large">
+            <div class="column field is-horizontal is-two-thirds is-full-mobile">
+                <div class="field-label">
+                    <label class="label">会議ID</label>
+                </div>
+                <div class="field-body">
+                    <input id="mid" name="mid" type="text" value="" autofocus maxlength="8" @input="sync" class="input is-primary is-large">
+                </div>
             </div>
             <div class="column">
                 <button type="submit" class="button is-link is-large is-fullwidth">参加</button>
