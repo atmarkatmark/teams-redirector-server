@@ -36,3 +36,62 @@ Microsoft Teamsには未登録のゲストを招待する機能があります�
 1. 会議主催者は8桁の数字をゲスト参加者に伝えます
 1. ゲスト参加者は8桁の数字を入力します(Bottle)
 1. 8桁の数字に対応したURLへリダイレクトされます(Redis, Bottle)
+
+## 使い方
+
+### 前提とする環境
+
+* Nginx等(リバースプロキシとして使う)
+* Docker
+* docker-compose
+
+### 環境作成
+
+```bash
+$ git clone https://github.com/atmarkatmark/teams-redirector-server.git
+$ cd teams-redirector-server
+$ sudo docker-compose build --no-cache
+$ sudo docker-compose up -d
+```
+
+デフォルトではTCP/3007で待ち受けます。
+Nginx等でアクセスを振り分けてください。
+
+NginxでのSSLを使う設定例は次の通りです。
+
+```
+upstream teams {
+        server 127.0.0.1:8007;
+}
+
+server {
+        listen 80;
+        server_name teams.kuratsuki.net;
+        return 301 https://$host$request_uri;
+}
+server {
+        listen 443 ssl;
+        ssl_certificate     /etc/letsencrypt/live/dev.kuratsuki.net/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/dev.kuratsuki.net/privkey.pem;
+        root /var/www/html;
+        server_name teams.kuratsuki.net;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        location / {
+                proxy_pass http://teams;
+        }
+}
+```
+
+### 環境削除
+
+```bash
+$ cd teams-redirector-server
+$ sudo docker-compose rm -sf
+```
+
+## 注意事項
+
+デフォルトでは10分間だけ会議URLを保持します。

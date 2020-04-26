@@ -10,7 +10,7 @@ from time import sleep
 # Redisの用意
 r = redis.Redis(host='localhost', port=6379, db=0)
 
-title = 'Microsoft Teams Redirector'
+title = 'Teams会議に参加する'
 seconds_to_keep = 60 * 10   # seconds
 password_digest = 'bc9ce810393f85d62d6715cba864d1f60cdd6000fdb80c5d8459556baac12b2a1124018871c02cefdad19ba167a61373e11466774b32b4dfcdbbd880fdfc9176'
 # sample password: hogehoge
@@ -120,4 +120,4 @@ def register():
 
     redirect(path_prefix + '/manage')
 
-run(host='localhost', port=8080, debug=True)
+run(host='0.0.0.0', port=8080)
