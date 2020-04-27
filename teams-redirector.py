@@ -31,7 +31,8 @@ validator['password'] = r'[a-zA-Z0-9!@#$%^&\*\(\)\-=_\+\[\]{}\\,\.<>;\':"`~]{,18
 
 def gen_mid():
     '''
-        8桁整数のランダムな会議IDを生成します。
+        n桁整数のランダムな会議IDを生成します。
+        @ToDo: 上限数に達した時に無限ループになる
     '''
     while True:
         mid = ''.join(random.choices(string.digits, k=id_length))
