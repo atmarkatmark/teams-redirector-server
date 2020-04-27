@@ -23,9 +23,10 @@ password_digest = 'bc9ce810393f85d62d6715cba864d1f60cdd6000fdb80c5d8459556baac12
     4. blake2b(s.encode('utf-8')).hexdigest()
 '''
 path_prefix = ''
+id_length = 4
 validator = {}
 validator['url'] = r'^https://teams.microsoft.com/[a-zA-Z0-9\.%/\?=-]+$'
-validator['mid'] = r'[0-9]{8}'
+validator['mid'] = f'[0-9]{{{id_length}}}'
 validator['password'] = r'[a-zA-Z0-9!@#$%^&\*\(\)\-=_\+\[\]{}\\,\.<>;\':"`~]{,18}'
 
 def gen_mid():
@@ -33,7 +34,7 @@ def gen_mid():
         8桁整数のランダムな会議IDを生成します。
     '''
     while True:
-        mid = ''.join(random.choices(string.digits, k=8))
+        mid = ''.join(random.choices(string.digits, k=id_length))
 
         # 重複がなかったら終了
         if not r.exists(mid):
@@ -50,11 +51,11 @@ def index():
 
     # 会議IDが指定されてなかったら普通のトップページ
     if not mid or not re.match(validator['mid'], mid):
-        return template('index', title=title, error=None, path_prefix=path_prefix)
+        return template('index', title=title, error=None, path_prefix=path_prefix, id_len=id_length)
     
     # 会議IDが存在しないものだったらエラー
     if not r.exists(mid):
-        return template('index', title=title, error=f'指定された会議ID: { mid } は存在しません', path_prefix=path_prefix)
+        return template('index', title=title, error=f'指定された会議ID: { mid } は存在しません', path_prefix=path_prefix, id_len=id_length)
     
     # 会議URLにリダイレクト
     url = r.get(mid).decode('utf-8')
@@ -108,7 +109,7 @@ def register():
         return template('error', title='Bad Password', message='パスワードが不正です', path_prefix=path_prefix)
 
     # 連続登録を防ぐための簡易処置
-    sleep(3)
+    sleep(2)
 
     # Check password
     if blake2b(pw.encode('utf-8')).hexdigest() != password_digest:

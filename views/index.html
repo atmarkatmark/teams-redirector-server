@@ -28,7 +28,7 @@
                     <label class="label">会議ID</label>
                 </div>
                 <div class="field-body">
-                    <input id="mid" name="mid" type="text" value="" autofocus maxlength="8" @input="sync" class="input is-primary is-large">
+                    <input id="mid" name="mid" type="text" value="" autofocus maxlength="{{ id_len }}" @input="sync" class="input is-primary is-large">
                 </div>
             </div>
             <div class="column">
@@ -37,14 +37,16 @@
         </div>
     </form>
 
-    <h2 class="subtitle">対応Webブラウザ</h2>
-    <ul>
-        <li>Microsoft Edge</li>
-        <li>Google Chrome(Windows版のみ)</li>
-    </ul>
+    <h2 class="subtitle">Microsoft Teams対応Webブラウザ</h2>
+    <div class="content">
+        <ul>
+            <li>Microsoft Edge</li>
+            <li>Google Chrome(Windows版のみ)</li>
+        </ul>
     
-    <p>これ以外のWebブラウザをお使いの場合、またはiOSやAndroid端末ではMicrosoft Teamsをインストールする必要があります。
-    「参加」した後に表示される画面の指示に従ってください。</p>
+        <p>これ以外のWebブラウザをお使いの場合、またはiOSやAndroid端末ではMicrosoft Teamsをインストールする必要がありますが、
+            <strong>アカウントの登録は必要ありません</strong>。参加した後に表示される画面の指示に従ってください。</p>
+    </div>
 
     <script>
         let app = new Vue({
@@ -55,7 +57,8 @@
 
             computed: {
                 mid_is_valid () {
-                    if (this.mid.length == 8 && /^[0-9]{8}$/.test(this.mid))
+                    const len = {{ id_len }}
+                    if (this.mid.length == len && /^[0-9]{len}$/.test(this.mid))
                         return true
                     
                     return false

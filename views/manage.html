@@ -11,7 +11,7 @@
     <style>
         /* 貼り付け欄とURL欄の高さを揃える */
         #receiver, #url {
-            height: 8em;
+            height: 10em;
         }
 
         /* プレースホルダ用 */
@@ -23,11 +23,10 @@
             content: attr(data-placeholder);
         }
 
-        /* 会議IDの中間にスペースを入れる */
-        .mid span {
-            margin-left: 0.2em;
-            margin-right: 0.2em;
-            font-weight: bold;
+        /* ボタンの間を空ける */
+        button {
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
         }
     </style>
 </head>
@@ -46,7 +45,7 @@
         <tbody>
             % for i in items:
             <tr {{ 'class=is-selected' if 590 < i['ttl'] else '' }}>
-                <td class="mid"><span>{{ i['mid'][:4] }}</span><span>{{ i['mid'][4:] }}</span></td>
+                <td class="mid">{{ i['mid'] }}</td>
                 <td>{{ i['ttl'] }} 秒</td>
                 <td><a href="{{ i['url'] }}" target="_blank">Link</a></td>
             </tr>
@@ -57,19 +56,26 @@
 
     <h2 class="subtitle">会議の登録</h2>
 
-    <p>Teamsで参加情報をコピーしてから貼り付け欄に貼り付けて、パスワードを入力してください。URLは自動で入力されます。</p>
+    <div class="content">
+        <ol type="1">
+            <li>参加するためのURLを入力(Teamsの場合は参加情報を貼り付け)</li>
+            <li>パスワードを入力</li>
+            <li>登録</li>
+        </ol>
+    </div>
 
     <form action="{{ path_prefix }}/register" method="POST">
         <!-- Teamsの会議参加リンク貼り付け場所 -->
         <div id="app" class="columns">
-            <div class="column is-half is-full-touch">
+            <div class="column is-full-touch" v-show="!url">
                 <label class="label">貼り付け欄</label>
-                <div id="receiver" contentEditable="true" @input="find_urls" :data-placeholder="placeholder" class="input is-primary"></div>
+                <div id="receiver" contentEditable="true" ref="receiver" @input="find_urls" :data-placeholder="placeholder" class="input is-primary"></div>
             </div>
+            
             <div class="column">
                 <label class="label">会議URL</label>
                 <label class="field">
-                    <textarea id="url" name="url" rows="3" style="width: 100%;" v-text="url" readonly class="input"></textarea>
+                    <textarea id="url" name="url" rows="3" style="width: 100%;" v-model="url" class="input is-primary" @input="validate_url"></textarea>
                 </label>
             </div>
 
@@ -78,15 +84,18 @@
                 <div class="field">
                     <input name="password" type="password" value="" class="input is-primary is-fullwidth">
                 </div>
-                <button class="button is-primary is-medium is-fullwidth" type="submit" v-if="url">登録</button>
+                <button class="button is-primary is-fullwidth is-medium" type="submit" :disabled="!ready">登録</button>
+                <button class="button is-danger is-fullwidth is-small is-outlined" type="reset" @click="clear">消去</button>
             </div>
         </div>
     </form>
 
     <h2 class="subtitle">メニュー</h2>
-    <ul>
-        <li><a href="/">会議へ参加</a></li>
-    </ul>
+    <div class="content">
+        <ul>
+            <li><a href="/">会議へ参加</a></li>
+        </ul>
+    </div>
 
     <script>
         let app = new Vue({
@@ -94,7 +103,8 @@
             data () {
                 return {
                     content: '',
-                    url: null
+                    url: null,
+                    ready: false
                 }
             },
 
@@ -104,19 +114,34 @@
                     if (this.content.length)
                         return ''
 
-                    return 'Teamsでコピーした会議参加情報をここに貼り付けてください'
+                    return 'Teamsでコピーした参加情報はここに貼り付けてください'
                 }
             },
 
             methods: {
-                find_urls(e) {
+                find_urls (e) {
                     const s = this.content = e.target.innerHTML
 
                     // 会議参加URLの抽出
                     let m = s.match(/https:\/\/teams.microsoft.com\/[^"]+/g)
-                    if (m) {
-                        this.url = m[0]
-                    }
+                    if (m) this.url = m[0]
+                    this.validate_url()
+                },
+
+                validate_url (e) {
+                    console.log('validating...')
+                    if (e && e.target)  console.log(e.target.value)
+                    console.log(this.url)
+                    if (/^https:\/\/teams.microsoft.com\/.+$/.test(this.url))
+                        this.ready = true
+                    else
+                        this.ready = false
+                },
+
+                clear (e) {
+                    this.url = null
+                    this.ready = false
+                    this.$refs.receiver.innerHTML = ''
                 }
             }
         })
