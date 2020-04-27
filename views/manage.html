@@ -59,7 +59,7 @@
 
     <p>Teamsで参加情報をコピーしてから貼り付け欄に貼り付けて、パスワードを入力してください。URLは自動で入力されます。</p>
 
-    <form action="/register" method="POST">
+    <form action="{{ path_prefix }}/register" method="POST">
         <!-- Teamsの会議参加リンク貼り付け場所 -->
         <div id="app" class="columns">
             <div class="column is-half is-full-touch">
