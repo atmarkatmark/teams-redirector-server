@@ -86,9 +86,9 @@
                 </div>
                 <label class="label">有効期間</label>
                 <div class="field">
-                    <select name="expire">
-                        % for i in expire
-                        <option value="{{ i }}">{{ i / 60 }}分</option>
+                    <select name="expire" class="input is-primary is-fullwidth">
+                        % for i in expire:
+                        <option value="{{ i }}">{{ int(i / 60) }}分</option>
                         % end
                     </select>
                 </div>
