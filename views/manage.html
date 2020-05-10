@@ -84,6 +84,14 @@
                 <div class="field">
                     <input name="password" type="password" value="" class="input is-primary is-fullwidth">
                 </div>
+                <label class="label">有効期間</label>
+                <div class="field">
+                    <select name="expire">
+                        % for i in expire
+                        <option value="{{ i }}">{{ i / 60 }}分</option>
+                        % end
+                    </select>
+                </div>
                 <button class="button is-primary is-fullwidth is-medium" type="submit" :disabled="!ready">登録</button>
                 <button class="button is-danger is-fullwidth is-small is-outlined" type="reset" @click="clear">消去</button>
             </div>

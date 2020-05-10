@@ -1,6 +1,6 @@
 # Teams-Redirector
 
-Microsoft Teamsの会議に未登録ゲストを招待するのを補助するためのWebアプリです。
+Microsoft Teamsの会議に未登録ゲストを招待するのを補助するためのWebサービスです。
 
 ## いきさつ
 
